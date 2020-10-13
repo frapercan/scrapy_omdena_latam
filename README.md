@@ -23,6 +23,16 @@ Web Crawling application running *Scrapy* Tool, extracting official policies fro
 
 **Document Type:** HTML
 
+### El Peruano
+**Search type:**
+
+**Speed:**
+
+**Amount of avaliable documents:**
+
+**Document Type:**
+
+
 
 
 
@@ -36,8 +46,32 @@ Use a virtual environment not your python system to run and also to install the 
 pip install -r requirements.txt
 ```
 
+
+
+## Scrapy settings.py
+https://drive.google.com/file/d/1bjbjYSXQqZQpJdwATRCLZFSRQciiULy-/view?usp=sharing
+### Warning!
+S3 upload pipeline and MySQL insert pipeline doesn't work together.
+Use:
+```
+ITEM_PIPELINES = {
+    # 'scrapy.pipelines.files.FilesPipeline': 100,
+    'scrapy_official_newspapers.pipelines.ScrapyOfficialNewspapersMySQLPipeline': 200,
+        }
+```
+
+and 
+
+```
+ITEM_PIPELINES = {
+     'scrapy.pipelines.files.FilesPipeline': 100,
+    #'scrapy_official_newspapers.pipelines.ScrapyOfficialNewspapersMySQLPipeline': 200,
+        }
+```
+The order doesn't mind.
+
 ## Database access
-Setup the DB access inserting credentials.json into *scrappy_official_newspapers*.
+Setup the DB access inserting settings.json into *scrappy_official_newspapers*.
 
 ```
 {
@@ -107,17 +141,6 @@ Not implemented like that, but the idea is to also keep track of:
 * file_proccesed_task_1_S3_url 
 
 So we are able to keep track of the policies with their attributes and also have the capability of maintaining the relationships and results of different processes.
-
-## Direction
-
-To create an interactive application, the first you need it is a database with information avaliable, and also an API where the solutions logic it is integrated.
-From this APi it would be deployed a web application that would serve as our Final Product.
-
-The database doesn't have to be populated exclusively from this scrapy tool, given the nature of the data, any other solution made that could fit the schema could be easily integrated into the system.
-
-The google search approach + NLP Semantic extraction would be perfect to massively populate this information system. 
-
-This information system could serve to integrate the rest of the project all together.
 
 ## What is this information system:
 Policies Documents Stored and indexed through the integration of a relational MySQL database and AWS S3 media database service (FTP would work too), with most attributes such as the title of the act, a resume of the document, the date of publication... 
