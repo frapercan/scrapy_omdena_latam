@@ -7,10 +7,6 @@ import os
 from scrapy.utils.python import to_bytes
 
 from scrapy.exporters import CsvItemExporter
-from scrapy_official_newspapers.functions import save_item, download_doc_url
-from scrapy_official_newspapers.db_config import DBSession
-from scrapy_official_newspapers.db_setup import Policy, Processing
-from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 from scrapy_official_newspapers.models import Policy, Processing, db_connect, create_table
 
