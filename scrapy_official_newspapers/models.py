@@ -5,7 +5,7 @@ from sqlalchemy import (
 
 from scrapy.utils.project import get_project_settings
 import datetime
-from scrapy_official_newspapers.db_config import db_user
+
 
 DeclarativeBase = declarative_base()
 
@@ -47,7 +47,7 @@ class Policy(DeclarativeBase):
     doc_tags = Column(String(500))
     related_docs = Column(String(500))
     comment = Column(Text)
-    username = Column(String(20), default=db_user, nullable=False)
+    username = Column(String(20), default=get_project_settings().get("DB_USER"), nullable=False)
     timestamp = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
     processing_id = Column(Integer, ForeignKey('processing.id'))
 
@@ -80,7 +80,7 @@ class URLsToScrape(DeclarativeBase):
     collector = Column(String(30))
     url = Column(String(2048), nullable=False)
     comment = Column(Text)
-    username = Column(String(20), default=db_user, nullable=False)
+    username = Column(String(20), default=get_project_settings().get("DB_USER"), nullable=False)
     timestamp = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
 
