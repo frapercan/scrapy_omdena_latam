@@ -19,7 +19,8 @@ class ScrapyOfficialNewspapersMySQLPipeline:
 
     def process_item(self, item, spider):
         session = self.session()
-        processing = Processing(s3_raw=hashlib.sha1(to_bytes(item['doc_url'])).hexdigest()).save_to_db(session)
+        processing = Processing(s3_raw=hashlib.sha1(to_bytes(item['doc_url'])).hexdigest())
+        session.add(processing)
 
         policy = Policy(
             country=item['country'],
@@ -36,9 +37,7 @@ class ScrapyOfficialNewspapersMySQLPipeline:
             doc_url=item['doc_url'],
             doc_name=item['doc_name'],
             doc_type=item['doc_type'],
-            processing_id=processing.id
-        ).save_to_db(session)
-
-
-
-
+            processing = processing
+        )
+        session.merge(policy)
+        session.commit()

@@ -1,4 +1,5 @@
 from sqlalchemy import create_engine, Column, Table, ForeignKey
+from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import (
     Integer, SmallInteger, String, Date, DateTime, Float, Boolean, Text, LargeBinary)
@@ -93,6 +94,7 @@ class Processing(DeclarativeBase):
     s3_txt = Column(String(200))
     s3_pos = Column(String(200))
     s3_ner = Column(String(200))
+    policy_id = relationship('Policy', backref='processing')
 
     def save_to_db(self, session):
         try:
