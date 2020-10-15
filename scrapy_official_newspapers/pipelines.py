@@ -41,3 +41,26 @@ class ScrapyOfficialNewspapersMySQLPipeline:
         )
         session.merge(policy)
         session.commit()
+
+
+from itemadapter import ItemAdapter
+from scrapy.exporters import CsvItemExporter
+
+
+class ScrapyOfficialNewspapersPipeline:
+	def __init__(self):
+		FEED_EXPORT_FIELDS = ['country', 'department', 'date', 'title', 'page_link', 'doc_link']
+		dir = "./"
+		file_name = "Scraped_Documents_local.csv"
+		file = dir + file_name
+		self.file = open(file, 'wb')
+		self.exporter = CsvItemExporter(self.file, encoding = 'Latin1')
+		self.exporter.start_exporting()
+
+	def close_spider(self, spider):
+		self.exporter.finish_exporting()
+		self.file.close()
+
+	def process_item(self, item, spider):
+		self.exporter.export_item(item)
+		return item
