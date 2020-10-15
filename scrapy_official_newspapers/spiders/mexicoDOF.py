@@ -24,6 +24,8 @@ class MexicoDOF(BaseSpider):
     doc_name = None
     doc_type = 'HTML'
 
+    def __init__(self, date):
+        self.date = date
 
     def create_url_DOF_list(self):
         URLs = []
