@@ -16,7 +16,11 @@ class ElPeruano(scrapy.Spider):
     scrapable = "True"
 
     def __init__(self, date):
-        self.from_date = date # date must be in format '%d-%m-%Y'
+        try:
+            self.from_date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+        except:
+            self.from_date = datetime.datetime.strptime(date, '%d-%m-%Y').date()
+        self.from_date = self.from_date.strftime('%d-%m-%Y')
         date_today = datetime.date.today()
         self.today = date_today.strftime('%d-%m-%Y')
         self.start_urls = [f'https://busquedas.elperuano.pe/api/v1/elvis?from_date={self.from_date}&page=0&scope=false&to_date={self.today}']

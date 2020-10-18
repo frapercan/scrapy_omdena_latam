@@ -1,13 +1,13 @@
 import scrapy
 import json
-from scrapy_official_newspapers.items import ScrapyOfficialNewspapersItem
 import datetime
+import math
 from dateparser import parse
+from scrapy_official_newspapers.items import ScrapyOfficialNewspapersItem
+
 
 class LeychileSpider(scrapy.Spider):
     name = "leychile"
-    num_pag = 2 # determine the number of pages to scrape from the total of 3493 (349.254 legal norms)
-    start_urls = [f"https://nuevo.leychile.cl/servicios/buscarjson?itemsporpagina=100&npagina={i}&cadena=" for i in range(1, num_pag)]
     country = "Chile"
     geo_code = "CHL-000-00000-0000000"
     level = "0"
@@ -16,7 +16,23 @@ class LeychileSpider(scrapy.Spider):
     scrapper_name = "Ignacio Fernandez"
     scrapable = "True"
 
+    def __init__(self, date):
+        try:
+            self.from_date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+        except:
+            self.from_date = datetime.datetime.strptime(date, '%d-%m-%Y').date()
+        date_today = datetime.date.today()
+        self.today = date_today.strftime('%Y-%m-%d')
+        self.start_urls = [f'https://nuevo.leychile.cl/servicios/Consulta/listaresultadosavanzada?stringBusqueda=-1%23normal%23on%7C%7C4%23normal%23{self.from_date}%23{self.today}%7C%7C117%23normal%23on%7C%7C48%23normal%23on&tipoNormaBA=&npagina=1&itemsporpagina=10&orden=2&tipoviene=4&totalitems=&seleccionado=0&taxonomia=&valor_taxonomia=&o=experta&r=']
+
     def parse(self, response):
+        hits = int(json.loads(response.text)[1]['totalitems'])
+        hits = math.ceil(hits/100) + 1
+        URLs = [f'https://nuevo.leychile.cl/servicios/Consulta/listaresultadosavanzada?stringBusqueda=-1%23normal%23on%7C%7C4%23normal%23{self.from_date}%23{self.today}%7C%7C117%23normal%23on%7C%7C48%23normal%23on&tipoNormaBA=&npagina={i}&itemsporpagina=100&orden=2&tipoviene=4&totalitems=&seleccionado=0&taxonomia=&valor_taxonomia=&o=experta&r=' for i in range(1, hits)]
+        for url in URLs:
+            yield scrapy.Request(url, dont_filter=True, callback=self.parse_other)
+
+    def parse_other(self, response):
         item = ScrapyOfficialNewspapersItem()
         for norm in json.loads(response.text)[0]:
             norm_id = norm['IDNORMA']
@@ -37,10 +53,8 @@ class LeychileSpider(scrapy.Spider):
             item['reference'] = norm_id
             item['publication_date'] = pub_date_format
             item['enforcement_date'] = norm['FECHA_PROMULGACION']
-            item['reference'] = None
             item['url'] = norm_url
             item['doc_url'] = doc_url
-            item['file_urls'] = [doc_url]
             item['doc_name'] = doc_name + '.' + doc_type
             item['doc_type'] = doc_type
             yield item
