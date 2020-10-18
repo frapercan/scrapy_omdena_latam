@@ -10,7 +10,7 @@ class ElPeruano(scrapy.Spider):
     country = "Peru"
     geo_code = "PER-000-00000-0000000"
     level = "0"
-    source = "legislacionforestal.org"
+    source = "busquedas.elperuano.pe"
     collector = "Ignacio Fernandez"
     scrapper_name = "Ignacio Fernandez"
     scrapable = "True"
