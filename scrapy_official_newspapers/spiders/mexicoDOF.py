@@ -5,6 +5,11 @@ from scrapy_official_newspapers.items import ScrapyOfficialNewspapersItem
 import time
 import re
 import datetime
+from dateutil.rrule import rrule, DAILY
+
+
+
+
 
 
 
@@ -24,18 +29,24 @@ class MexicoDOF(BaseSpider):
     doc_name = None
     doc_type = 'HTML'
 
-    def __init__(self, date):
-        self.date = date
+    def __init__(self, date = datetime.datetime(1990,1,1)):
+        if type(date) == str:
+            try:
+                self.from_date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+            except:
+                self.from_date = datetime.datetime.strptime(date, '%d-%m-%Y').date()
+        else:
+            self.from_date = date.date()
+        self.today = datetime.date.today()
 
     def create_url_DOF_list(self):
         URLs = []
-        for year in self.years:
-            for month in range(1, 13):
-                for day in range(1, 32):
-                    url = self.url + f"/index_113.php?year=" + self.add_leading_zero_two_digits(
-                        year) + "&month=" + self.add_leading_zero_two_digits(
-                        month) + "&day=" + self.add_leading_zero_two_digits(day)
-                    URLs.append(url)
+        for dt in rrule(DAILY, dtstart=self.from_date, until=self.today):
+            url = self.url + f"/index_113.php?year=" + self.add_leading_zero_two_digits(
+                        dt.year) + "&month=" + self.add_leading_zero_two_digits(
+                        dt.month) + "&day=" + self.add_leading_zero_two_digits(dt.day)
+
+            URLs.append(url)
         return URLs
 
     def start_requests(self):
