@@ -42,7 +42,7 @@ class ElPeruano(scrapy.Spider):
             item['authorship'] = norm['metadata']['editionName']
             item['resume'] = norm['metadata']['description'].encode('utf-8')
             item['publication_date'] = norm['metadata']['publicationDate']['formatted']
-            item['enforcement_date'] = ''
+            item['enforcement_date'] = item['publication_date']
             item['url'] = 'https://busquedas.elperuano.pe' + str(norm['url_link'])
             item['doc_name'] = ('PER/policy_' + norm['metadata']['name'])
             item['doc_type'] = 'pdf'
@@ -57,4 +57,7 @@ class ElPeruano(scrapy.Spider):
                 item['doc_url'] = 'https://busquedas.elperuano.pe/download/url/' + str(norm['metadata']['slug'])
             except:
                 pass
+            item['file_urls'] = [item['doc_url']]
+            for column in item:
+                item[column] = item[column] or False
             yield item
